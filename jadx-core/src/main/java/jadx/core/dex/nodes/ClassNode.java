@@ -22,6 +22,7 @@ import jadx.api.ICodeInfo;
 import jadx.api.ICodeWriter;
 import jadx.api.JadxArgs;
 import jadx.api.JavaClass;
+import jadx.api.core.nodes.IClassNode;
 import jadx.api.impl.SimpleCodeInfo;
 import jadx.api.plugins.input.data.IClassData;
 import jadx.api.plugins.input.data.IFieldData;
@@ -55,7 +56,7 @@ import jadx.core.utils.exceptions.JadxRuntimeException;
 import static jadx.core.dex.nodes.ProcessState.LOADED;
 import static jadx.core.dex.nodes.ProcessState.NOT_LOADED;
 
-public class ClassNode extends NotificationAttrNode implements ILoadable, ICodeNode, Comparable<ClassNode> {
+public class ClassNode extends NotificationAttrNode implements IClassNode, ILoadable, ICodeNode, Comparable<ClassNode> {
 	private static final Logger LOG = LoggerFactory.getLogger(ClassNode.class);
 
 	private final RootNode root;
