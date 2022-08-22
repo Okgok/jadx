@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import jadx.api.plugins.JadxPlugin;
+import jadx.api.plugins.JadxPluginContext;
 import jadx.api.plugins.JadxPluginInfo;
-import jadx.api.plugins.input.JadxInputPlugin;
-import jadx.api.plugins.input.data.ILoadResult;
-import jadx.api.plugins.input.data.impl.EmptyLoadResult;
+import jadx.api.plugins.input.ICodeLoader;
+import jadx.api.plugins.input.JadxCodeInput;
+import jadx.api.plugins.input.data.impl.EmptyCodeLoader;
 
-public class JavaInputPlugin implements JadxInputPlugin {
+public class JavaInputPlugin implements JadxPlugin, JadxCodeInput {
 
 	public static final JadxPluginInfo PLUGIN_INFO = new JadxPluginInfo(
 			"java-input",
@@ -24,14 +26,19 @@ public class JavaInputPlugin implements JadxInputPlugin {
 	}
 
 	@Override
-	public ILoadResult loadFiles(List<Path> inputFiles) {
+	public void init(JadxPluginContext context) {
+		context.addCodeInput(this);
+	}
+
+	@Override
+	public ICodeLoader loadFiles(List<Path> inputFiles) {
 		return loadClassFiles(inputFiles, null);
 	}
 
-	public static ILoadResult loadClassFiles(List<Path> inputFiles, @Nullable Closeable closeable) {
+	public static ICodeLoader loadClassFiles(List<Path> inputFiles, @Nullable Closeable closeable) {
 		List<JavaClassReader> readers = new JavaFileLoader().collectFiles(inputFiles);
 		if (readers.isEmpty()) {
-			return EmptyLoadResult.INSTANCE;
+			return EmptyCodeLoader.INSTANCE;
 		}
 		return new JavaLoadResult(readers, closeable);
 	}
