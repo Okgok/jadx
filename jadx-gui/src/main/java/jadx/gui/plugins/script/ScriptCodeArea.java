@@ -61,7 +61,9 @@ public class ScriptCodeArea extends AbstractCodeArea {
 	}
 
 	public void updateCode(String newCode) {
+		int caretPos = getCaretPosition();
 		setText(newCode);
+		setCaretPosition(caretPos);
 		scriptNode.setChanged(true);
 	}
 
