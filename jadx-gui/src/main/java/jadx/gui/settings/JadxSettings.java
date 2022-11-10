@@ -105,6 +105,8 @@ public class JadxSettings extends JadxCLIArgs {
 	 */
 	private int treeWidth = 130;
 
+	private boolean dockLogViewer = true;
+
 	private int settingsVersion = 0;
 
 	@JadxSettingsAdapter.GsonExclude
@@ -680,6 +682,15 @@ public class JadxSettings extends JadxCLIArgs {
 
 	public void setJumpOnDoubleClick(boolean jumpOnDoubleClick) {
 		this.jumpOnDoubleClick = jumpOnDoubleClick;
+	}
+
+	public boolean isDockLogViewer() {
+		return dockLogViewer;
+	}
+
+	public void setDockLogViewer(boolean dockLogViewer) {
+		this.dockLogViewer = dockLogViewer;
+		partialSync(settings -> this.dockLogViewer = dockLogViewer);
 	}
 
 	private void upgradeSettings(int fromVersion) {
