@@ -994,9 +994,14 @@ public class InsnGen {
 		int extArgsCount = customNode.getArgsCount();
 		int startArg = customNode.getHandleType() == MethodHandleType.INVOKE_STATIC ? 0 : 1; // skip 'this' arg
 		for (int i = startArg; i < extArgsCount; i++) {
-			RegisterArg extArg = (RegisterArg) customNode.getArg(i);
-			RegisterArg callRegArg = callArgs.get(i);
-			callRegArg.getSVar().setCodeVar(extArg.getSVar().getCodeVar());
+			InsnArg arg = customNode.getArg(i);
+			if (arg.isRegister()) {
+				RegisterArg extArg = (RegisterArg) arg;
+				RegisterArg callRegArg = callArgs.get(i);
+				callRegArg.getSVar().setCodeVar(extArg.getSVar().getCodeVar());
+			} else {
+				throw new JadxRuntimeException("Unexpected argument type in lambda call: " + arg.getClass().getSimpleName());
+			}
 		}
 		code.add(" -> {");
 		code.incIndent();
@@ -1053,27 +1058,23 @@ public class InsnGen {
 		}
 		int argsCount = insn.getArgsCount();
 		code.add('(');
+		SkipMethodArgsAttr skipAttr = mthNode == null ? null : mthNode.get(AType.SKIP_MTH_ARGS);
 		boolean firstArg = true;
 		if (k < argsCount) {
 			for (int i = k; i < argsCount; i++) {
 				InsnArg arg = insn.getArg(i);
-				if (arg.contains(AFlag.SKIP_ARG)) {
+				if (arg.contains(AFlag.SKIP_ARG) || (skipAttr != null && skipAttr.isSkip(i - startArgNum))) {
 					continue;
 				}
-				int argOrigPos = i - startArgNum;
-				if (SkipMethodArgsAttr.isSkip(mthNode, argOrigPos)) {
-					continue;
-				}
-				if (!firstArg) {
-					code.add(", ");
-				} else {
+				if (firstArg) {
 					firstArg = false;
+				} else {
+					code.add(", ");
 				}
 				if (i == argsCount - 1 && processVarArg(code, insn, arg)) {
 					continue;
 				}
 				addArg(code, arg, false);
-				firstArg = false;
 			}
 		}
 		code.add(')');
